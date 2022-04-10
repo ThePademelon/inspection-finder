@@ -35,7 +35,7 @@ async Task<IEnumerable<Listing>> DeserializePageData(string url)
     var web = new HtmlDocument();
     web.Load(new GZipStream(stream, CompressionMode.Decompress));
     return web.DocumentNode.Descendants("div")
-        .Where(x => x.GetAttributeValue("data-testid", null) == "listing-card-inspection")
+        .Where(x => x.HasMatchingDataId("listing-card-inspection"))
         .Select(ConvertToListing);
 }
 
@@ -43,7 +43,7 @@ Listing ConvertToListing(HtmlNode listingNode)
 {
     // TODO: Regex
     var beds = listingNode.Descendants("span")
-        .Single(x => x.GetAttributeValue("data-testid", null) == "property-features-text-container" && (x.InnerText.EndsWith("Beds") || x.InnerText.EndsWith("Bed")));
+        .Single(x => x.HasMatchingDataId("property-features-text-container") && (x.InnerText.EndsWith("Beds") || x.InnerText.EndsWith("Bed")));
     var justTheInt = beds.InnerText.Replace(" Beds", null).Replace(" Bed", null);
     var bedsQty = int.Parse(justTheInt);
 
