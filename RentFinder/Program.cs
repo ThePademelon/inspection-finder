@@ -1,4 +1,5 @@
-﻿using System.IO.Compression;
+﻿using System.Globalization;
+using System.IO.Compression;
 using HtmlAgilityPack;
 
 // TODO: Pass in these via CLI
@@ -45,5 +46,16 @@ Listing ConvertToListing(HtmlNode listingNode)
         .Single(x => x.GetAttributeValue("data-testid", null) == "property-features-text-container" && (x.InnerText.EndsWith("Beds") || x.InnerText.EndsWith("Bed")));
     var justTheInt = beds.InnerText.Replace(" Beds", null).Replace(" Bed", null);
     var bedsQty = int.Parse(justTheInt);
-    return new Listing {Beds = bedsQty};
+
+    var price = listingNode.Descendants("p").Single(x => x.HasMatchingDataId("listing-card-price")).InnerText;
+    var priceDecimal = decimal.Parse(price, NumberStyles.Currency);
+    return new Listing {Beds = bedsQty, Price = priceDecimal};
+}
+
+public static class HtmlNodeExtensions
+{
+    public static bool HasMatchingDataId(this HtmlNode node, string value)
+    {
+        return value.Equals(node.GetAttributeValue("data-testid", null));
+    }
 }
