@@ -9,20 +9,25 @@ public static class InspectionFinder
 {
     public static async Task Search(Options options)
     {
-        // TODO: Handle paging
-        var url = $"https://www.domain.com.au/rent/{options.Location}/inspection-times/?inspectiondate={options.Day:yyyy-MM-dd}";
-        var data = await DeserializePageData(url);
-
+        var page = 1;
+        bool @continue;
         const string horizontalRule = "================================================================";
         Console.WriteLine(horizontalRule);
-        foreach (var listing in data)
+        do
         {
-            Console.WriteLine($"Address:        {listing.Location}");
-            Console.WriteLine($"Beds:           {listing.Beds}");
-            Console.WriteLine($"Rent:           {listing.Price:$0.00}");
-            Console.WriteLine($"Rent per Bed:   {listing.PricePerBed:$0.00}");
-            Console.WriteLine(horizontalRule);
-        }
+            var url = $"https://www.domain.com.au/rent/{options.Location}/inspection-times/?inspectiondate={options.Day:yyyy-MM-dd}&page={page++}";
+            var data = (await DeserializePageData(url)).ToList();
+
+            @continue = data.Any();
+            foreach (var listing in data)
+            {
+                Console.WriteLine($"Address:        {listing.Location}");
+                Console.WriteLine($"Beds:           {listing.Beds}");
+                Console.WriteLine($"Rent:           {listing.Price:$0.00}");
+                Console.WriteLine($"Rent per Bed:   {listing.PricePerBed:$0.00}");
+                Console.WriteLine(horizontalRule);
+            }
+        } while (@continue);
     }
 
     private static async Task<IEnumerable<Listing>> DeserializePageData(string url)
