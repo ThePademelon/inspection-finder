@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.IO.Compression;
 using HtmlAgilityPack;
+using RentFinder;
 
 // TODO: Pass in these via CLI
 const string locationId = "collingwood-vic-3066";
@@ -50,12 +51,4 @@ Listing ConvertToListing(HtmlNode listingNode)
     var price = listingNode.Descendants("p").Single(x => x.HasMatchingDataId("listing-card-price")).InnerText;
     var priceDecimal = decimal.Parse(price, NumberStyles.Currency);
     return new Listing {Beds = bedsQty, Price = priceDecimal};
-}
-
-public static class HtmlNodeExtensions
-{
-    public static bool HasMatchingDataId(this HtmlNode node, string value)
-    {
-        return value.Equals(node.GetAttributeValue("data-testid", null));
-    }
 }
