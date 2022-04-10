@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.IO.Compression;
+using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 
 namespace RentFinder;
@@ -45,11 +46,11 @@ public static class InspectionFinder
 
     private static Listing ConvertToListing(HtmlNode listingNode)
     {
-        // TODO: Regex
-        var bedsNode = listingNode.Descendants("span")
-            .Single(x => x.HasMatchingDataId("property-features-text-container") && (x.InnerText.EndsWith("Beds") || x.InnerText.EndsWith("Bed")));
-        var bedsText = bedsNode.InnerText.Replace(" Beds", null).Replace(" Bed", null);
-        var beds = int.Parse(bedsText);
+        var bedsRegex = new Regex(@"(\d+) Beds?");
+        var bedsText = listingNode.Descendants("span")
+            .Single(x => x.HasMatchingDataId("property-features-text-container") && bedsRegex.IsMatch(x.InnerText)).InnerText;
+        var bedsNumberString = bedsRegex.Match(bedsText).Groups[1].Value;
+        var beds = int.Parse(bedsNumberString);
 
         var priceText = listingNode.Descendants("p")
             .Single(x => x.HasMatchingDataId("listing-card-price"))
