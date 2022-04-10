@@ -52,10 +52,11 @@ public static class InspectionFinder
         var bedsNumberString = bedsRegex.Match(bedsText).Groups[1].Value;
         var beds = int.Parse(bedsNumberString);
 
+        var priceRegex = new Regex(@"\$\d+(\.\d+)?");
         var priceText = listingNode.Descendants("p")
             .Single(x => x.HasMatchingDataId("listing-card-price"))
             .InnerText;
-        var price = decimal.Parse(priceText, NumberStyles.Currency);
+        var price = decimal.Parse(priceRegex.Match(priceText).Value, NumberStyles.Currency);
 
         var locationText = listingNode.Descendants("h2")
             .Single(x => x.HasMatchingDataId("address-wrapper"))
