@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.IO.Compression;
+using System.Text;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using HtmlAgilityPack;
@@ -43,9 +44,21 @@ public static class InspectionFinder
                 Console.WriteLine($"Rent:               {list.Price:$0.00}");
                 Console.WriteLine($"Rent per Bed:       {list.PricePerBed:$0.00}");
                 Console.WriteLine($"Air Conditioning:   {(list.AirCon ? '✅' : '❓')}");
+                Console.WriteLine($"Real Shower:        {ConvertToEmoji(list.RealShower)}");
                 Console.WriteLine(horizontalRule);
             }
         } while (@continue);
+    }
+
+    private static string ConvertToEmoji(Answer listRealShower)
+    {
+        return listRealShower switch
+        {
+            Answer.Maybe => "❓",
+            Answer.No => "❌",
+            Answer.Yes => "✅",
+            _ => throw new ArgumentOutOfRangeException(nameof(listRealShower), listRealShower, null)
+        };
     }
 
     private static async Task<IEnumerable<Task<Listing>>> DeserializePageData(string url)
@@ -66,19 +79,21 @@ public static class InspectionFinder
 
     private static async Task<Listing> ConvertToListing(HtmlNode listingNode)
     {
+        var listing = new Listing();
+
         var bedsRegex = new Regex(@"(\d+) Beds?");
         var bedsText = listingNode.Descendants("span")
             .Single(x => x.HasMatchingDataId("property-features-text-container") && bedsRegex.IsMatch(x.InnerText)).InnerText;
         var bedsNumberString = bedsRegex.Match(bedsText).Groups[1].Value;
-        var beds = int.Parse(bedsNumberString);
+        listing.Beds = int.Parse(bedsNumberString);
 
         var priceRegex = new Regex(@"\$\d+(\.\d+)?");
         var priceText = listingNode.Descendants("p")
             .Single(x => x.HasMatchingDataId("listing-card-price"))
             .InnerText;
-        var price = decimal.Parse(priceRegex.Match(priceText).Value, NumberStyles.Currency);
+        listing.Price = decimal.Parse(priceRegex.Match(priceText).Value, NumberStyles.Currency);
 
-        var locationText = listingNode.Descendants("h2")
+        listing.Location = listingNode.Descendants("h2")
             .Single(x => x.HasMatchingDataId("address-wrapper"))
             .InnerText;
 
@@ -88,24 +103,28 @@ public static class InspectionFinder
             .Single(x => x.Id.Equals("__NEXT_DATA__")).InnerText;
 
         var pageProps = JsonNode.Parse(listingJsonRaw)!["props"]!["pageProps"]!;
-        var description = string.Join(' ', pageProps["description"]!.AsArray().Select(x => (string?) x));
-        
+        var searchTextBuilder = new StringBuilder();
+        searchTextBuilder.AppendLine(string.Join(' ', pageProps["description"]!.AsArray().Select(x => (string?) x)));
+
         var featuresData = pageProps["features"];
         if (featuresData != null)
         {
-            description += ' ';
-            description += string.Join(' ', featuresData.AsArray().Select(x => (string?) x));
+            searchTextBuilder.AppendLine(string.Join(' ', featuresData.AsArray().Select(x => (string?) x)));
         }
 
         var structuredFeaturesData = pageProps["structuredFeatures"];
         if (structuredFeaturesData != null)
         {
-            description += ' ';
-            description += string.Join(' ', structuredFeaturesData.AsArray().Select(x => x?["name"]));
+            searchTextBuilder.AppendLine(string.Join(' ', structuredFeaturesData.AsArray().Select(x => x?["name"])));
         }
-        
-        var hasAc = Regex.IsMatch(description, @"\b(A/?C|air.?con(ditioning)?|split.?system|cooling)\b", RegexOptions.IgnoreCase);
-        
-        return new Listing {Beds = beds, Price = price, Location = locationText, AirCon = hasAc};
+
+        var searchText = searchTextBuilder.ToString();
+        listing.AirCon = Regex.IsMatch(searchText, @"\b(A/?C|air.?con(ditioning)?|split.?system|cooling)\b", RegexOptions.IgnoreCase);
+        var showerOverBath = Regex.IsMatch(searchText, @"\b(shower.over.bath)\b", RegexOptions.IgnoreCase);
+        var walkInShower = Regex.IsMatch(searchText, @"\b(walk.in shower)\b", RegexOptions.IgnoreCase);
+        if (walkInShower) listing.RealShower = Answer.Yes;
+        else if (showerOverBath) listing.RealShower = Answer.No;
+
+        return listing;
     }
 }
