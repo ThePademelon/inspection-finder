@@ -84,12 +84,27 @@ public static class InspectionFinder
 
         var listingPage = listingNode.Descendants("a").Select(x => x.GetAttributeValue("href", null)).Single();
         var pageHtml = await GetDocument(listingPage);
-        var descriptionText = pageHtml.DocumentNode.Descendants("script")
-            .Single(x =>
-                x.Id.Equals("__NEXT_DATA__")).InnerText;
+        var listingJsonRaw = pageHtml.DocumentNode.Descendants("script")
+            .Single(x => x.Id.Equals("__NEXT_DATA__")).InnerText;
 
-        var descriptionData = JsonNode.Parse(descriptionText)!["props"]!["pageProps"]!["description"]!.ToString();
-        var hasAc = Regex.IsMatch(descriptionData, @"\b(A/?C|air.?con(ditioning)?|split.?system|cooling)\b", RegexOptions.IgnoreCase);
+        var pageProps = JsonNode.Parse(listingJsonRaw)!["props"]!["pageProps"]!;
+        var description = string.Join(' ', pageProps["description"]!.AsArray().Select(x => (string?) x));
+        
+        var featuresData = pageProps["features"];
+        if (featuresData != null)
+        {
+            description += ' ';
+            description += string.Join(' ', featuresData.AsArray().Select(x => (string?) x));
+        }
+
+        var structuredFeaturesData = pageProps["structuredFeatures"];
+        if (structuredFeaturesData != null)
+        {
+            description += ' ';
+            description += string.Join(' ', structuredFeaturesData.AsArray().Select(x => x?["name"]));
+        }
+        
+        var hasAc = Regex.IsMatch(description, @"\b(A/?C|air.?con(ditioning)?|split.?system|cooling)\b", RegexOptions.IgnoreCase);
         
         return new Listing {Beds = beds, Price = price, Location = locationText, AirCon = hasAc};
     }
