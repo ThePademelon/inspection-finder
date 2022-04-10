@@ -43,12 +43,15 @@ async Task<IEnumerable<Listing>> DeserializePageData(string url)
 Listing ConvertToListing(HtmlNode listingNode)
 {
     // TODO: Regex
-    var beds = listingNode.Descendants("span")
-        .Single(x => x.HasMatchingDataId("property-features-text-container") && (x.InnerText.EndsWith("Beds") || x.InnerText.EndsWith("Bed")));
-    var justTheInt = beds.InnerText.Replace(" Beds", null).Replace(" Bed", null);
-    var bedsQty = int.Parse(justTheInt);
+    var bedsNode = listingNode.Descendants("span")
+        .Single(x => x.HasMatchingDataId("property-features-text-container") &&
+                     (x.InnerText.EndsWith("Beds") || x.InnerText.EndsWith("Bed")));
+    var bedsText = bedsNode.InnerText.Replace(" Beds", null).Replace(" Bed", null);
+    var beds = int.Parse(bedsText);
 
-    var price = listingNode.Descendants("p").Single(x => x.HasMatchingDataId("listing-card-price")).InnerText;
-    var priceDecimal = decimal.Parse(price, NumberStyles.Currency);
-    return new Listing {Beds = bedsQty, Price = priceDecimal};
+    var priceText = listingNode.Descendants("p").Single(x => x.HasMatchingDataId("listing-card-price")).InnerText;
+    var price = decimal.Parse(priceText, NumberStyles.Currency);
+
+    var locationText = listingNode.Descendants("h2").Single(x => x.HasMatchingDataId("address-wrapper")).InnerText;
+    return new Listing {Beds = beds, Price = price, Location = locationText};
 }
