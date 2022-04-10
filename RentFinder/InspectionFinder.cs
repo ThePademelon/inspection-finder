@@ -89,7 +89,7 @@ public static class InspectionFinder
                 x.Id.Equals("__NEXT_DATA__")).InnerText;
 
         var descriptionData = JsonNode.Parse(descriptionText)!["props"]!["pageProps"]!["description"]!.ToString();
-        var hasAc = Regex.IsMatch(descriptionData, @"\b(A/?C|air.?con(ditioning)?|split.?system)\b", RegexOptions.IgnoreCase);
+        var hasAc = Regex.IsMatch(descriptionData, @"\b(A/?C|air.?con(ditioning)?|split.?system|cooling)\b", RegexOptions.IgnoreCase);
         
         return new Listing {Beds = beds, Price = price, Location = locationText, AirCon = hasAc};
     }
