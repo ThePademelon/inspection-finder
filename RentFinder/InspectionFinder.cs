@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.IO.Compression;
 using System.Text;
@@ -128,7 +129,9 @@ public static class InspectionFinder
         var priceText = listingNode.Descendants("p")
             .Single(x => x.HasMatchingDataId("listing-card-price"))
             .InnerText;
-        listing.Price = decimal.Parse(priceRegex.Match(priceText).Value, NumberStyles.Currency);
+        var match = priceRegex.Match(priceText);
+        if (match.Success) listing.Price = decimal.Parse(match.Value, NumberStyles.Currency);
+        else Debug.WriteLine($"Failed to parse price '{priceText}'");
 
         listing.Location = listingNode.Descendants("h2")
             .Single(x => x.HasMatchingDataId("address-wrapper"))
