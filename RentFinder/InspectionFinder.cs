@@ -1,7 +1,9 @@
 using System.Globalization;
 using System.IO.Compression;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 
@@ -30,6 +32,7 @@ public static class InspectionFinder
         bool @continue;
         const string horizontalRule = "================================================================";
         Console.WriteLine(horizontalRule);
+        var filter = await GetFilter(options.FilterFilePath);
         do
         {
             var url = $"https://www.domain.com.au/rent/{options.Location}/inspection-times/?inspectiondate={options.Day:yyyy-MM-dd}&page={page++}";
@@ -39,7 +42,7 @@ public static class InspectionFinder
             await foreach (var listing in data)
             {
                 @continue = true;
-                if (!MatchesFilter(listing)) continue;
+                if (filter != null && !MatchesFilter(filter, listing)) continue;
                 Console.WriteLine($"Address:            {listing.Location}");
                 Console.WriteLine($"Beds:               {listing.Beds}");
                 Console.WriteLine($"Rent:               {listing.Price:$0.00}");
@@ -53,10 +56,21 @@ public static class InspectionFinder
         } while (@continue);
     }
 
-    private static bool MatchesFilter(Listing listing)
+    private static async Task<ListingFilter?> GetFilter(string filterPath)
     {
-        // TODO: YOUR FILTER HERE
-        return true;
+        if (string.IsNullOrEmpty(filterPath)) return null;
+        var filterText = await File.ReadAllTextAsync(filterPath);
+        return JsonSerializer.Deserialize<ListingFilter>(filterText, new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() }});
+    }
+
+    private static bool MatchesFilter(ListingFilter filter, Listing listing)
+    {
+        var match = listing.PricePerBed <= filter.MaxPricePerBed;
+        match |= listing.Beds == 1 && listing.Price <= filter.MaxPriceOneBed;
+        match &= filter.AcceptableAirCons.Contains(listing.AirCon);
+        match &= filter.AcceptableRealShowers.Contains(listing.RealShower);
+        match &= filter.AcceptableCarpets.Contains(listing.Carpeted);
+        return match;
     }
 
     private static string ConvertToEmoji(Answer listRealShower)
