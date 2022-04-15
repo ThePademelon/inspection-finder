@@ -95,7 +95,11 @@ public static class InspectionFinder
     {
         var web = await GetDocument(url);
         var listingNodes = web.DocumentNode.Descendants("div")
-            .Where(x => x.HasMatchingDataId("listing-card-inspection"));
+            .Where(x => x.HasMatchingDataId("listing-card-inspection") 
+                        || x.HasMatchingDataId("listing-card-wrapper-premiumplus")
+                        || x.HasMatchingDataId("listing-card-wrapper-standardpp")
+                        || x.HasMatchingDataId("listing-card-wrapper-elite")
+                        || x.HasMatchingDataId("listing-card-wrapper-elitepp"));
         foreach (var listingNode in listingNodes)
         {
             yield return await ConvertToListing(listingNode);
