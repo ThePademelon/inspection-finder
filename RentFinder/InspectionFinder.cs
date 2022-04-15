@@ -43,8 +43,10 @@ public static class InspectionFinder
                 Console.WriteLine($"Beds:               {list.Beds}");
                 Console.WriteLine($"Rent:               {list.Price:$0.00}");
                 Console.WriteLine($"Rent per Bed:       {list.PricePerBed:$0.00}");
-                Console.WriteLine($"Air Conditioning:   {(list.AirCon ? '✅' : '❓')}");
+                Console.WriteLine($"Air Conditioning:   {ConvertToEmoji(list.AirCon)}");
                 Console.WriteLine($"Real Shower:        {ConvertToEmoji(list.RealShower)}");
+                Console.WriteLine($"Carpeted:           {ConvertToEmoji(list.Carpeted)}");
+                Console.WriteLine($"URL:                {list.Url}");
                 Console.WriteLine(horizontalRule);
             }
         } while (@continue);
@@ -119,12 +121,16 @@ public static class InspectionFinder
         }
 
         var searchText = searchTextBuilder.ToString();
-        listing.AirCon = Regex.IsMatch(searchText, @"\b(A/?C|air.?con(ditioning)?|split.?system|cooling)\b", RegexOptions.IgnoreCase);
-        var showerOverBath = Regex.IsMatch(searchText, @"\b(shower.over.bath)\b", RegexOptions.IgnoreCase);
-        var walkInShower = Regex.IsMatch(searchText, @"\b(walk.in shower)\b", RegexOptions.IgnoreCase);
+        listing.AirCon = Regex.IsMatch(searchText, @"\b(A/?C|air.?con(ditioning)?|split.?system|cooling)\b", RegexOptions.IgnoreCase) ? Answer.Yes : Answer.Maybe;
+        var showerOverBath = Regex.IsMatch(searchText, @"\b(shower.over.bath(tub)?s?)\b", RegexOptions.IgnoreCase);
+        var walkInShower = Regex.IsMatch(searchText, @"\b(walk.in showers?)\b", RegexOptions.IgnoreCase);
         if (walkInShower) listing.RealShower = Answer.Yes;
         else if (showerOverBath) listing.RealShower = Answer.No;
-
+        var carpet = Regex.IsMatch(searchText, @"\bcarpet(ed|ing)?\b");
+        var woodFloor = Regex.IsMatch(searchText, @"\b(timber|(hard)?wood) floor(ing|s)?\b");
+        if (carpet) listing.Carpeted = Answer.Yes;
+        else if (woodFloor) listing.Carpeted = Answer.No;
+        listing.Url = listingPage;
         return listing;
     }
 }
