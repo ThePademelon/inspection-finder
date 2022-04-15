@@ -122,15 +122,29 @@ public static class InspectionFinder
 
         var searchText = searchTextBuilder.ToString();
         listing.AirCon = Regex.IsMatch(searchText, @"\b(A/?C|air.?con(ditioning)?|split.?system|cooling)\b", RegexOptions.IgnoreCase) ? Answer.Yes : Answer.Maybe;
+
         var showerOverBath = Regex.IsMatch(searchText, @"\b(shower.over.bath(tub)?s?)\b", RegexOptions.IgnoreCase);
         var walkInShower = Regex.IsMatch(searchText, @"\b(walk.in showers?)\b", RegexOptions.IgnoreCase);
-        if (walkInShower) listing.RealShower = Answer.Yes;
-        else if (showerOverBath) listing.RealShower = Answer.No;
+        listing.RealShower = ResolveAnswer(walkInShower, showerOverBath);
+
         var carpet = Regex.IsMatch(searchText, @"\bcarpet(ed|ing)?\b");
         var woodFloor = Regex.IsMatch(searchText, @"\b(timber|(hard)?wood) floor(ing|s)?\b");
-        if (carpet) listing.Carpeted = Answer.Yes;
-        else if (woodFloor) listing.Carpeted = Answer.No;
+        listing.Carpeted = ResolveAnswer(carpet, woodFloor);
+
         listing.Url = listingPage;
         return listing;
+    }
+
+    /// <summary>
+    /// Resolves two booleans to an <see cref="Answer"/> as per the following table:
+    /// <para>F F = Maybe</para>
+    /// F T = No
+    /// <para>T T = Yes</para>
+    /// T F = Yes
+    /// </summary>
+    private static Answer ResolveAnswer(bool yes, bool no)
+    {
+        if (yes) return Answer.Yes;
+        return no ? Answer.No : Answer.Maybe;
     }
 }
