@@ -134,7 +134,7 @@ public static class InspectionFinder
             .Single(x => x.HasMatchingDataId("address-wrapper"))
             .InnerText;
 
-        var listingPage = listingNode.Descendants("a").Select(x => x.GetAttributeValue("href", null)).Single();
+        var listingPage = listingNode.Descendants("a").Select(x => x.GetAttributeValue("href", null)).First();
         var pageHtml = await GetDocument(listingPage);
         var listingJsonRaw = pageHtml.DocumentNode.Descendants("script")
             .Single(x => x.Id.Equals("__NEXT_DATA__")).InnerText;
