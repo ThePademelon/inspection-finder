@@ -35,8 +35,15 @@ public static class InspectionFinder
         var filter = await GetFilter(options.FilterFilePath);
         do
         {
-            var url = $"https://www.domain.com.au/rent/{options.Location}/inspection-times/?inspectiondate={options.Day:yyyy-MM-dd}&page={page++}";
-            var data = DeserializePageData(url);
+            var uriBuilder = new UriBuilderPlus($"https://www.domain.com.au/rent/{options.Location}/");
+            if (options.Day != null)
+            {
+                uriBuilder.AddPath("inspection-times");
+                uriBuilder.AddQuery($"inspectiondate={options.Day:yyyy-MM-dd}");
+            }
+
+            uriBuilder.AddQuery($"page={page++}");
+            var data = DeserializePageData(uriBuilder.ToString());
 
             @continue = false;
             await foreach (var listing in data)
