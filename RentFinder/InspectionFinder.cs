@@ -33,23 +33,30 @@ public static class InspectionFinder
         do
         {
             var url = $"https://www.domain.com.au/rent/{options.Location}/inspection-times/?inspectiondate={options.Day:yyyy-MM-dd}&page={page++}";
-            var data = (await DeserializePageData(url)).ToList();
+            var data = DeserializePageData(url);
 
-            @continue = data.Any();
-            foreach (var listing in data)
+            @continue = false;
+            await foreach (var listing in data)
             {
-                var list = await listing;
-                Console.WriteLine($"Address:            {list.Location}");
-                Console.WriteLine($"Beds:               {list.Beds}");
-                Console.WriteLine($"Rent:               {list.Price:$0.00}");
-                Console.WriteLine($"Rent per Bed:       {list.PricePerBed:$0.00}");
-                Console.WriteLine($"Air Conditioning:   {ConvertToEmoji(list.AirCon)}");
-                Console.WriteLine($"Real Shower:        {ConvertToEmoji(list.RealShower)}");
-                Console.WriteLine($"Carpeted:           {ConvertToEmoji(list.Carpeted)}");
-                Console.WriteLine($"URL:                {list.Url}");
+                @continue = true;
+                if (!MatchesFilter(listing)) continue;
+                Console.WriteLine($"Address:            {listing.Location}");
+                Console.WriteLine($"Beds:               {listing.Beds}");
+                Console.WriteLine($"Rent:               {listing.Price:$0.00}");
+                Console.WriteLine($"Rent per Bed:       {listing.PricePerBed:$0.00}");
+                Console.WriteLine($"Air Conditioning:   {ConvertToEmoji(listing.AirCon)}");
+                Console.WriteLine($"Real Shower:        {ConvertToEmoji(listing.RealShower)}");
+                Console.WriteLine($"Carpeted:           {ConvertToEmoji(listing.Carpeted)}");
+                Console.WriteLine($"URL:                {listing.Url}");
                 Console.WriteLine(horizontalRule);
             }
         } while (@continue);
+    }
+
+    private static bool MatchesFilter(Listing listing)
+    {
+        // TODO: YOUR FILTER HERE
+        return true;
     }
 
     private static string ConvertToEmoji(Answer listRealShower)
@@ -63,12 +70,15 @@ public static class InspectionFinder
         };
     }
 
-    private static async Task<IEnumerable<Task<Listing>>> DeserializePageData(string url)
+    private static async IAsyncEnumerable<Listing> DeserializePageData(string url)
     {
         var web = await GetDocument(url);
-        return web.DocumentNode.Descendants("div")
-            .Where(x => x.HasMatchingDataId("listing-card-inspection"))
-            .Select(ConvertToListing);
+        var listingNodes = web.DocumentNode.Descendants("div")
+            .Where(x => x.HasMatchingDataId("listing-card-inspection"));
+        foreach (var listingNode in listingNodes)
+        {
+            yield return await ConvertToListing(listingNode);
+        }
     }
 
     private static async Task<HtmlDocument> GetDocument(string url)
