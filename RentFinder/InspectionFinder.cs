@@ -119,46 +119,22 @@ public static class InspectionFinder
     {
         var listing = new Listing();
 
-        var bedsRegex = new Regex(@"(\d+) Beds?");
-        var bedsText = listingNode.Descendants("span")
-            .Single(x => x.HasMatchingDataId("property-features-text-container") && bedsRegex.IsMatch(x.InnerText)).InnerText;
-        var bedsNumberString = bedsRegex.Match(bedsText).Groups[1].Value;
-        listing.Beds = int.Parse(bedsNumberString);
-
-        var priceRegex = new Regex(@"\$\d+(\.\d+)?");
-        var priceText = listingNode.Descendants("p")
-            .Single(x => x.HasMatchingDataId("listing-card-price"))
-            .InnerText;
-        var match = priceRegex.Match(priceText);
-        if (match.Success) listing.Price = decimal.Parse(match.Value, NumberStyles.Currency);
-        else Debug.WriteLine($"Failed to parse price '{priceText}'");
-
-        listing.Location = listingNode.Descendants("h2")
-            .Single(x => x.HasMatchingDataId("address-wrapper"))
-            .InnerText;
-
         var listingPage = listingNode.Descendants("a").Select(x => x.GetAttributeValue("href", null)).First();
         var pageHtml = await GetDocument(listingPage);
         var listingJsonRaw = pageHtml.DocumentNode.Descendants("script")
             .Single(x => x.Id.Equals("__NEXT_DATA__")).InnerText;
 
         var pageProps = JsonNode.Parse(listingJsonRaw)!["props"]!["pageProps"]!;
-        var searchTextBuilder = new StringBuilder();
-        searchTextBuilder.AppendLine(string.Join(' ', pageProps["description"]!.AsArray().Select(x => (string?) x)));
 
-        var featuresData = pageProps["features"];
-        if (featuresData != null)
-        {
-            searchTextBuilder.AppendLine(string.Join(' ', featuresData.AsArray().Select(x => (string?) x)));
-        }
-
-        var structuredFeaturesData = pageProps["structuredFeatures"];
-        if (structuredFeaturesData != null)
-        {
-            searchTextBuilder.AppendLine(string.Join(' ', structuredFeaturesData.AsArray().Select(x => x?["name"])));
-        }
-
-        var searchText = searchTextBuilder.ToString();
+        listing.Beds = (int) pageProps["beds"]!;
+        listing.Location = (string) pageProps["address"]!;
+        
+        var priceText = (string) pageProps["listingSummary"]!["price"]!;
+        var match = Regex.Match(priceText, @"\$\d+(\.\d+)?");
+        if (match.Success) listing.Price = decimal.Parse(match.Value, NumberStyles.Currency);
+        else Debug.WriteLine($"Failed to parse price '{priceText}'");
+        
+        var searchText = GetSearchText(pageProps);
         listing.AirCon = Regex.IsMatch(searchText, @"\b(A/?C|air.?con(ditioning)?|split.?system|cooling)\b", RegexOptions.IgnoreCase) ? Answer.Yes : Answer.Maybe;
 
         var showerOverBath = Regex.IsMatch(searchText, @"\b(shower.over.bath(tub)?s?)\b", RegexOptions.IgnoreCase);
@@ -171,6 +147,26 @@ public static class InspectionFinder
 
         listing.Url = listingPage;
         return listing;
+    }
+
+    private static string GetSearchText(JsonNode pageProps)
+    {
+        var searchTextBuilder = new StringBuilder();
+        searchTextBuilder.AppendLine(string.Join(' ', pageProps["description"]!.AsArray().Select(x => (string?) x)));
+        
+        var featuresData = pageProps["features"];
+        if (featuresData != null)
+        {
+            searchTextBuilder.AppendLine(string.Join(' ', featuresData.AsArray().Select(x => (string?) x)));
+        }
+
+        var structuredFeaturesData = pageProps["structuredFeatures"];
+        if (structuredFeaturesData != null)
+        {
+            searchTextBuilder.AppendLine(string.Join(' ', structuredFeaturesData.AsArray().Select(x => x?["name"])));
+        }
+
+        return searchTextBuilder.ToString();
     }
 
     /// <summary>
