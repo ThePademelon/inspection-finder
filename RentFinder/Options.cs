@@ -12,4 +12,7 @@ public class Options
 
     [Option('f', "filter", HelpText = "The path to your filter file.")]
     public string FilterFilePath { get; set; }
+
+    [Option('s', "supplemental-data", HelpText = "The path to your supplemental data file.")]
+    public string SupplemetalDataPath { get; set; }
 }

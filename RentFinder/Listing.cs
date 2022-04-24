@@ -10,4 +10,5 @@ public class Listing
     public Answer RealShower { get; set; }
     public Answer Carpeted { get; set; }
     public string Url { get; set; }
+    public string Slug { get; set; }
 }

@@ -10,7 +10,7 @@ using HtmlAgilityPack;
 
 namespace RentFinder;
 
-public static class InspectionFinder
+public class InspectionFinder
 {
     private static readonly HttpClient HttpClient;
 
@@ -27,7 +27,25 @@ public static class InspectionFinder
         };
     }
 
-    public static async Task Search(Options options)
+    private Dictionary<string, SupplementalData>? _supplementalData;
+
+    public static async Task SearchWithOptions(Options options)
+    {
+        var finder = new InspectionFinder
+        {
+            _supplementalData = await DeserializeSupplementalData(options.SupplemetalDataPath)
+        };
+        await finder.Search(options);
+    }
+
+    private static async Task<Dictionary<string, SupplementalData>?> DeserializeSupplementalData(string supplementalDataPath)
+    {
+        if (string.IsNullOrEmpty(supplementalDataPath)) return null;
+        var dataText = await File.ReadAllTextAsync(supplementalDataPath);
+        return JsonSerializer.Deserialize<Dictionary<string, SupplementalData>>(dataText, new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() }});
+    }
+
+    private async Task Search(Options options)
     {
         var page = 1;
         bool @continue;
@@ -92,7 +110,7 @@ public static class InspectionFinder
         };
     }
 
-    private static async IAsyncEnumerable<Listing> DeserializePageData(string url)
+    private async IAsyncEnumerable<Listing> DeserializePageData(string url)
     {
         var web = await GetDocument(url);
         var listingNodes = web.DocumentNode.Descendants("div")
@@ -103,8 +121,20 @@ public static class InspectionFinder
                         || x.HasMatchingDataId("listing-card-wrapper-elitepp"));
         foreach (var listingNode in listingNodes)
         {
-            yield return await ConvertToListing(listingNode);
+            var listing = await ConvertToListing(listingNode);
+            ApplySupplementalData(ref listing);
+            yield return listing;
         }
+    }
+
+    private void ApplySupplementalData(ref Listing listing)
+    {
+        if (_supplementalData is null || !_supplementalData.TryGetValue(listing.Slug, out var supplementalData)) return;
+        listing.Beds = supplementalData.Beds ?? listing.Beds;
+        listing.Carpeted = supplementalData.Carpeted ?? listing.Carpeted;
+        listing.Price = supplementalData.Price ?? listing.Price;
+        listing.AirCon = supplementalData.AirCon ?? listing.AirCon;
+        listing.RealShower = supplementalData.RealShower ?? listing.RealShower;
     }
 
     private static async Task<HtmlDocument> GetDocument(string url)
@@ -128,7 +158,8 @@ public static class InspectionFinder
 
         listing.Beds = (int) pageProps["beds"]!;
         listing.Location = (string) pageProps["address"]!;
-        
+        listing.Slug = new Uri(((string) pageProps["listingUrl"])!).Segments.Last();
+
         var priceText = (string) pageProps["listingSummary"]!["price"]!;
         var match = Regex.Match(priceText, @"\$\d+(\.\d+)?");
         if (match.Success) listing.Price = decimal.Parse(match.Value, NumberStyles.Currency);

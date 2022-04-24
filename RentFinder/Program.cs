@@ -1,4 +1,4 @@
 ﻿using CommandLine;
 using RentFinder;
 
-await Parser.Default.ParseArguments<Options>(args).WithParsedAsync(InspectionFinder.Search);
+await Parser.Default.ParseArguments<Options>(args).WithParsedAsync(InspectionFinder.SearchWithOptions);
