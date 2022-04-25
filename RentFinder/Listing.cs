@@ -11,4 +11,5 @@ public class Listing
     public Answer Carpeted { get; set; }
     public string Url { get; set; }
     public string Slug { get; set; }
+    public bool Ignored { get; set; }
 }

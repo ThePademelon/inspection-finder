@@ -91,6 +91,7 @@ public class InspectionFinder
 
     private static bool MatchesFilter(ListingFilter filter, Listing listing)
     {
+        if (listing.Ignored) return false;
         var match = listing.PricePerBed <= filter.MaxPricePerBed;
         match |= listing.Beds == 1 && listing.Price <= filter.MaxPriceOneBed;
         match &= filter.AcceptableAirCons.Contains(listing.AirCon);
@@ -135,6 +136,7 @@ public class InspectionFinder
         listing.Price = supplementalData.Price ?? listing.Price;
         listing.AirCon = supplementalData.AirCon ?? listing.AirCon;
         listing.RealShower = supplementalData.RealShower ?? listing.RealShower;
+        listing.Ignored = supplementalData.Ignored ?? listing.Ignored;
     }
 
     private static async Task<HtmlDocument> GetDocument(string url)

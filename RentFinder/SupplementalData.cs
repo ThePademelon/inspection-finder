@@ -7,4 +7,5 @@ public class SupplementalData
     public decimal? Price { get; set; }
     public Answer? AirCon { get; set; }
     public Answer? RealShower { get; set; }
+    public bool? Ignored { get; set; }
 }
