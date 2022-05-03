@@ -11,7 +11,8 @@
   ],
   "AcceptableCarpets" : [
     "Yes",
-    "Maybe"
+    "Maybe",
+    "No"
   ],
   "AcceptableSecureEntrances" : [
     "No",
