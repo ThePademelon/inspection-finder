@@ -176,7 +176,7 @@ public class InspectionFinder
         listing.RealShower = ResolveAnswer(walkInShower, showerOverBath);
 
         var carpet = Regex.IsMatch(searchText, @"\bcarpet(ed|ing)?\b");
-        var woodFloor = Regex.IsMatch(searchText, @"\b(timber|(hard)?wood) floor(ing|s)?\b");
+        var woodFloor = Regex.IsMatch(searchText, @"\b(((timber|(hard)?wood(en)?) floor(ing|s|boards)?)|floorboards)\b");
         listing.Carpeted = ResolveAnswer(carpet, woodFloor);
 
         listing.Url = listingPage;
