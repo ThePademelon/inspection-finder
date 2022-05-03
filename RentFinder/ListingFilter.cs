@@ -7,4 +7,5 @@ internal class ListingFilter
     public List<Answer> AcceptableAirCons { get; set; }
     public List<Answer> AcceptableRealShowers { get; set; }
     public List<Answer> AcceptableCarpets { get; set; }
+    public List<Answer> AcceptableSecureEntrances { get; set; }
 }

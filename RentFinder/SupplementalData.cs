@@ -8,4 +8,5 @@ public class SupplementalData
     public Answer? AirCon { get; set; }
     public Answer? RealShower { get; set; }
     public bool? Ignored { get; set; }
+    public Answer? SecureEntrance { get; set; }
 }

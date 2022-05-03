@@ -12,4 +12,5 @@ public class Listing
     public string Url { get; set; }
     public string Slug { get; set; }
     public bool Ignored { get; set; }
+    public Answer SecureEntrance { get; set; }
 }

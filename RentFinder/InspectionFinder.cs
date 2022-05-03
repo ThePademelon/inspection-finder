@@ -76,6 +76,7 @@ public class InspectionFinder
                 Console.WriteLine($"Air Conditioning:   {ConvertToEmoji(listing.AirCon)}");
                 Console.WriteLine($"Real Shower:        {ConvertToEmoji(listing.RealShower)}");
                 Console.WriteLine($"Carpeted:           {ConvertToEmoji(listing.Carpeted)}");
+                Console.WriteLine($"Secure Entrance:    {ConvertToEmoji(listing.SecureEntrance)}");
                 Console.WriteLine($"URL:                {listing.Url}");
                 Console.WriteLine(horizontalRule);
             }
@@ -97,6 +98,7 @@ public class InspectionFinder
         match &= filter.AcceptableAirCons.Contains(listing.AirCon);
         match &= filter.AcceptableRealShowers.Contains(listing.RealShower);
         match &= filter.AcceptableCarpets.Contains(listing.Carpeted);
+        match &= filter.AcceptableSecureEntrances.Contains(listing.SecureEntrance);
         return match;
     }
 
@@ -137,6 +139,7 @@ public class InspectionFinder
         listing.AirCon = supplementalData.AirCon ?? listing.AirCon;
         listing.RealShower = supplementalData.RealShower ?? listing.RealShower;
         listing.Ignored = supplementalData.Ignored ?? listing.Ignored;
+        listing.SecureEntrance = supplementalData.SecureEntrance ?? listing.SecureEntrance;
     }
 
     private static async Task<HtmlDocument> GetDocument(string url)
@@ -178,6 +181,9 @@ public class InspectionFinder
         var carpet = Regex.IsMatch(searchText, @"\bcarpet(ed|ing)?\b");
         var woodFloor = Regex.IsMatch(searchText, @"\b(((timber|(hard)?wood(en)?) floor(ing|s|boards)?)|floorboards)\b");
         listing.Carpeted = ResolveAnswer(carpet, woodFloor);
+
+        var secureEntrance = Regex.IsMatch(searchText, @"\b(secur(e|ity) entr(ance|ry)|intercom)\b");
+        listing.SecureEntrance = ResolveAnswer(secureEntrance, false);
 
         listing.Url = listingPage;
         return listing;
