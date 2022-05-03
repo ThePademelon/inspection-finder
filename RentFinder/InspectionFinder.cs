@@ -178,11 +178,11 @@ public class InspectionFinder
         var walkInShower = Regex.IsMatch(searchText, @"\b(walk.in showers?)\b", RegexOptions.IgnoreCase);
         listing.RealShower = ResolveAnswer(walkInShower, showerOverBath);
 
-        var carpet = Regex.IsMatch(searchText, @"\bcarpet(ed|ing)?\b");
-        var woodFloor = Regex.IsMatch(searchText, @"\b(((timber|(hard)?wood(en)?) floor(ing|s|boards)?)|floorboards)\b");
+        var carpet = Regex.IsMatch(searchText, @"\bcarpet(ed|ing)?\b", RegexOptions.IgnoreCase);
+        var woodFloor = Regex.IsMatch(searchText, @"\b(((timber|(hard)?wood(en)?) floor(ing|s|boards)?)|floorboards)\b", RegexOptions.IgnoreCase);
         listing.Carpeted = ResolveAnswer(carpet, woodFloor);
 
-        var secureEntrance = Regex.IsMatch(searchText, @"\b(secur(e|ity) ?(building)? entr(ance|y)|intercom)\b");
+        var secureEntrance = Regex.IsMatch(searchText, @"\b(secur(e|ity) ?(building)? entr(ance|y)|intercom)\b", RegexOptions.IgnoreCase);
         listing.SecureEntrance = ResolveAnswer(secureEntrance, false);
 
         listing.Url = listingPage;
