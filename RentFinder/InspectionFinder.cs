@@ -182,7 +182,7 @@ public class InspectionFinder
         var woodFloor = Regex.IsMatch(searchText, @"\b(((timber|(hard)?wood(en)?) floor(ing|s|boards)?)|floorboards)\b");
         listing.Carpeted = ResolveAnswer(carpet, woodFloor);
 
-        var secureEntrance = Regex.IsMatch(searchText, @"\b(secur(e|ity) entr(ance|ry)|intercom)\b");
+        var secureEntrance = Regex.IsMatch(searchText, @"\b(secur(e|ity) ?(building)? entr(ance|y)|intercom)\b");
         listing.SecureEntrance = ResolveAnswer(secureEntrance, false);
 
         listing.Url = listingPage;
