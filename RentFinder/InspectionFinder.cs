@@ -77,7 +77,7 @@ public class InspectionFinder
                 Console.WriteLine($"Real Shower:        {ConvertToEmoji(listing.RealShower)}");
                 Console.WriteLine($"Carpeted:           {ConvertToEmoji(listing.Carpeted)}");
                 Console.WriteLine($"Secure Entrance:    {ConvertToEmoji(listing.SecureEntrance)}");
-                foreach (var email in listing.AgentEmails) Console.WriteLine($"Agent Email:        {email}");
+                foreach (var email in listing.AgentEmails) Console.WriteLine($"Agent Email:        mailto:{email}");
                 Console.WriteLine($"URL:                {listing.Url}");
                 Console.WriteLine(horizontalRule);
             }
