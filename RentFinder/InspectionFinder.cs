@@ -77,6 +77,7 @@ public class InspectionFinder
                 Console.WriteLine($"Real Shower:        {ConvertToEmoji(listing.RealShower)}");
                 Console.WriteLine($"Carpeted:           {ConvertToEmoji(listing.Carpeted)}");
                 Console.WriteLine($"Secure Entrance:    {ConvertToEmoji(listing.SecureEntrance)}");
+                foreach (var email in listing.AgentEmails) Console.WriteLine($"Agent Email:        {email}");
                 Console.WriteLine($"URL:                {listing.Url}");
                 Console.WriteLine(horizontalRule);
             }
@@ -185,8 +186,20 @@ public class InspectionFinder
         var secureEntrance = Regex.IsMatch(searchText, @"\b(secur(e|ity) ?(building)? entr(ance|y)|intercom)\b", RegexOptions.IgnoreCase);
         listing.SecureEntrance = ResolveAnswer(secureEntrance, false);
 
+        var agentsArray = pageProps["agents"]!.AsArray();
+        listing.AgentEmails = GetEmails(agentsArray);
+
         listing.Url = listingPage;
         return listing;
+    }
+
+    private static IEnumerable<string> GetEmails(JsonArray agents)
+    {
+        foreach (var agent in agents)
+        {
+            var email64 = (string?) agent?["email"];
+            if (email64 is not null) yield return Encoding.UTF8.GetString(Convert.FromBase64String(email64));
+        }
     }
 
     private static string GetSearchText(JsonNode pageProps)

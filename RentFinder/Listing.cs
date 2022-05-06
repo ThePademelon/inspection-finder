@@ -13,4 +13,5 @@ public class Listing
     public string Slug { get; set; }
     public bool Ignored { get; set; }
     public Answer SecureEntrance { get; set; }
+    public IEnumerable<string> AgentEmails { get; set; }
 }
