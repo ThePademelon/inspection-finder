@@ -10,6 +10,23 @@
     <ItemGroup>
       <PackageReference Include="CommandLineParser" Version="2.8.0" />
       <PackageReference Include="HtmlAgilityPack" Version="1.11.42" />
+      <PackageReference Include="System.CodeDom" Version="6.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="MailTemplate.tt" />
+      <TextTemplatingFilePreprocessor Include="MailTemplate.tt">
+        <Generator>TextTemplatingFilePreprocessor</Generator>
+        <LastGenOutput>MailTemplate.cs</LastGenOutput>
+      </TextTemplatingFilePreprocessor>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="MailTemplate.cs">
+        <AutoGen>True</AutoGen>
+        <DesignTime>True</DesignTime>
+        <DependentUpon>MailTemplate.tt</DependentUpon>
+      </Compile>
     </ItemGroup>
 
 </Project>

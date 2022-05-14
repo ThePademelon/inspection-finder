@@ -1,0 +1,22 @@
+<#@ template language="C#" #>
+G'day, my name is <#= Environment.UserName #> and I just have a few questions about <#= _listing.Location #>
+
+<# if (_listing.AirCon == Answer.Maybe)
+   { #>
+Is there air conditioning at this property?
+<# } #>
+<# if (_listing.Carpeted == Answer.No)
+   { #>
+Would the landlord be okay with the tenant laying some carpet, at least for the duration of the tenancy?
+<# } #>
+<# if (_listing.SecureEntrance == Answer.Maybe)
+   { #>
+Are there any obstructions from the street to the front door of the property? (such as security gates or keyless entries)
+<# } #>
+<# if (_listing.RealShower == Answer.Maybe)
+   { #>
+Is the bathroom shower a walk-in or over-bath?
+<# } #>
+
+Regards,
+<#= Environment.UserName #>.
