@@ -205,8 +205,13 @@ public class InspectionFinder
     private static string GetSearchText(JsonNode pageProps)
     {
         var searchTextBuilder = new StringBuilder();
-        searchTextBuilder.AppendLine(string.Join(' ', pageProps["description"]!.AsArray().Select(x => (string?) x)));
-        
+
+        var pageProp = pageProps["description"];
+        if (!string.IsNullOrEmpty(pageProp?.ToString()))
+        {
+            searchTextBuilder.AppendLine(string.Join(' ', pageProp.AsArray().Select(x => (string?) x)));
+        }
+
         var featuresData = pageProps["features"];
         if (featuresData != null)
         {
