@@ -5,4 +5,5 @@ obj/
 riderModule.iml
 deployment.xml
 personal-supplemental-data.json
+personal-filter.json
 MailTemplate.cs

@@ -1,19 +1,11 @@
 {
-  "21-2-the-vaucluse-richmond-vic-3121-15760607": {
-    "Carpeted": null,
-    "Beds": null,
-    "Price": null,
-    "AirCon": null,
-    "RealShower": "No"
-  },
-  "69-alfred-crescent-fitzroy-north-vic-3068-15801341": {
-    "Price": 1500
-  },
-  "7-6-8-charlotte-street-collingwood-vic-3066-15848050": {
-    "RealShower": "No"
-  },
-  "234-3-hoddle-street-collingwood-vic-3066-15843037": {
+  "123-example-street-richmond-vic-3121-1300655506": {
     "Carpeted": "Yes",
-    "RealShower": "Yes"
+    "Beds": 1,
+    "Price": 123,
+    "AirCon": "Maybe",
+    "RealShower": "No",
+    "Ignored": false,
+    "SecureEntrance": "Yes"
   }
 }

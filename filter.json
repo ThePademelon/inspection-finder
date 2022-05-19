@@ -2,20 +2,15 @@
   "MaxPricePerBed" : 200,
   "MaxPriceOneBed" : 400,
   "AcceptableAirCons" : [
-    "Yes",
     "Maybe"
   ],
   "AcceptableRealShowers" : [
-    "Yes",
-    "Maybe"
+    "Yes"
   ],
   "AcceptableCarpets" : [
-    "Yes",
-    "Maybe",
     "No"
   ],
   "AcceptableSecureEntrances" : [
-    "No",
     "Maybe"
   ]
 }
