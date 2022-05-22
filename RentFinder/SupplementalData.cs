@@ -9,4 +9,5 @@ public class SupplementalData
     public Answer? RealShower { get; set; }
     public bool? Ignored { get; set; }
     public Answer? SecureEntrance { get; set; }
+    public bool? WaitingOnEnquiry { get; set; }
 }

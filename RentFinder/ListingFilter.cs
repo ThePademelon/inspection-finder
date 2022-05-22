@@ -8,4 +8,5 @@ internal class ListingFilter
     public List<Answer> AcceptableRealShowers { get; set; }
     public List<Answer> AcceptableCarpets { get; set; }
     public List<Answer> AcceptableSecureEntrances { get; set; }
+    public bool ShowWaitingOnEnquiry { get; set; }
 }

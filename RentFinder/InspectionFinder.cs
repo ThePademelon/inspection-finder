@@ -100,6 +100,7 @@ public class InspectionFinder
         match &= filter.AcceptableRealShowers.Contains(listing.RealShower);
         match &= filter.AcceptableCarpets.Contains(listing.Carpeted);
         match &= filter.AcceptableSecureEntrances.Contains(listing.SecureEntrance);
+        match &= filter.ShowWaitingOnEnquiry == listing.WaitingOnEnquiry;
         return match;
     }
 
@@ -141,6 +142,7 @@ public class InspectionFinder
         listing.RealShower = supplementalData.RealShower ?? listing.RealShower;
         listing.Ignored = supplementalData.Ignored ?? listing.Ignored;
         listing.SecureEntrance = supplementalData.SecureEntrance ?? listing.SecureEntrance;
+        listing.WaitingOnEnquiry = supplementalData.WaitingOnEnquiry ?? listing.WaitingOnEnquiry;
     }
 
     private static async Task<HtmlDocument> GetDocument(string url)

@@ -6,6 +6,7 @@
     "AirCon": "Maybe",
     "RealShower": "No",
     "Ignored": false,
-    "SecureEntrance": "Yes"
+    "SecureEntrance": "Yes",
+    "WaitingOnEnquiry": false
   }
 }

@@ -12,5 +12,6 @@
   ],
   "AcceptableSecureEntrances" : [
     "Maybe"
-  ]
+  ],
+  "ShowWaitingOnEnquiry": false
 }

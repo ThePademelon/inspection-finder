@@ -14,4 +14,5 @@ public class Listing
     public bool Ignored { get; set; }
     public Answer SecureEntrance { get; set; }
     public IEnumerable<string> AgentEmails { get; set; }
+    public bool WaitingOnEnquiry { get; set; }
 }
