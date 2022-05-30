@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.IO.Compression;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -147,10 +148,18 @@ public class InspectionFinder
 
     private static async Task<HtmlDocument> GetDocument(string url)
     {
-        var stream = await HttpClient.GetStreamAsync(url);
-        var web = new HtmlDocument();
-        web.Load(new GZipStream(stream, CompressionMode.Decompress));
-        return web;
+        try
+        {
+            var stream = await HttpClient.GetStreamAsync(url);
+            var web = new HtmlDocument();
+            web.Load(new GZipStream(stream, CompressionMode.Decompress));
+            return web;
+        }
+        catch (HttpRequestException e) when (e.StatusCode == HttpStatusCode.BadRequest)
+        {
+            // Last page (probably), return no listings
+            return new HtmlDocument();
+        }
     }
 
     private static async Task<Listing> ConvertToListing(HtmlNode listingNode)
