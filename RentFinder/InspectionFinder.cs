@@ -162,7 +162,7 @@ public class InspectionFinder
         var listingJsonRaw = pageHtml.DocumentNode.Descendants("script")
             .Single(x => x.Id.Equals("__NEXT_DATA__")).InnerText;
 
-        var pageProps = JsonNode.Parse(listingJsonRaw)!["props"]!["pageProps"]!;
+        var pageProps = JsonNode.Parse(listingJsonRaw)!["props"]!["pageProps"]!["componentProps"]!;
 
         listing.Beds = (int) pageProps["beds"]!;
         listing.Location = (string) pageProps["address"]!;
