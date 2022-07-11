@@ -179,7 +179,7 @@ public class InspectionFinder
 
         var priceText = (string) pageProps["listingSummary"]!["price"]!;
         priceText = priceText.Replace(",", string.Empty);
-        var match = Regex.Match(priceText, @"\$\d+(\.\d+)?");
+        var match = Regex.Match(priceText, @"\d+(\.\d+)?");
         if (match.Success) listing.Price = decimal.Parse(match.Value, NumberStyles.Currency);
         else Debug.WriteLine($"Failed to parse price '{priceText}'");
         
