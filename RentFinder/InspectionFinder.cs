@@ -186,7 +186,7 @@ public class InspectionFinder
         var searchText = GetSearchText(pageProps);
         listing.AirCon = Regex.IsMatch(searchText, @"\b(A/?C|air.?con(ditioning)?|split.?system|cooling)\b", RegexOptions.IgnoreCase) ? Answer.Yes : Answer.Maybe;
 
-        var showerOverBath = Regex.IsMatch(searchText, @"\b(shower.over.bath(tub)?s?)\b", RegexOptions.IgnoreCase);
+        var showerOverBath = Regex.IsMatch(searchText, @"\b(shower.over ?(the)? bath(tub)?s?)\b", RegexOptions.IgnoreCase);
         var walkInShower = Regex.IsMatch(searchText, @"\b(walk.in showers?)\b", RegexOptions.IgnoreCase);
         listing.RealShower = ResolveAnswer(walkInShower, showerOverBath);
 
